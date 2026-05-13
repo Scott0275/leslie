@@ -25,7 +25,7 @@ function escapeHtml(s: string) {
  *
  * Vercel env:
  * - RESEND_API_KEY (required for server path)
- * - RESEND_FROM e.g. "Leslie Bookings <bookings@yourdomain.com>" (verified domain)
+ * - RESEND_FROM optional; defaults to "Leslie Bookings <admin@hextech.works>" (domain must be verified in Resend)
  * - BOOKING_TO_EMAIL optional; defaults to SITE.email
  */
 export async function POST(req: Request) {
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
 
   const resend = new Resend(apiKey);
   const from =
-    process.env.RESEND_FROM?.trim() || "Leslie Bookings <onboarding@resend.dev>";
+    process.env.RESEND_FROM?.trim() || "Leslie Bookings <admin@hextech.works>";
   const to = (process.env.BOOKING_TO_EMAIL?.trim() || SITE.email).trim();
 
   const safe = {
