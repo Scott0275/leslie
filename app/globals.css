@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-noir-950 text-zinc-200 antialiased;
+}
+
+::selection {
+  @apply bg-crimson/30 text-white;
+}
+
+.gold-line {
+  @apply h-px w-24 bg-gradient-to-r from-transparent via-gold to-transparent;
+}
+
+.input-field {
+  @apply w-full rounded-lg border border-noir-700 bg-noir-900/80 px-4 py-3 text-sm text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-gold/50 focus:ring-1 focus:ring-gold/30;
+}
