@@ -42,7 +42,7 @@ const galleryImages = Array.from({ length: GALLERY_COUNT }, (_, i) => {
   return `/leslie/${n}.jpeg`;
 });
 
-const WHATSAPP_URL = `https://wa.me/${SITE.phoneDigitsWa}`;
+const WHATSAPP_URL = `https://wa.me/12012388773`;
 const TELEGRAM_URL = "https://t.me/leslie_newyork";
 
 /** ~1,500 characters — enticing, professional companion framing */
@@ -107,10 +107,10 @@ const services = [
 ] as const;
 
 const rates = [
-  { duration: "90 minutes", incall: "$900", outcall: "$1,000" },
-  { duration: "2 hours", incall: "$1,200", outcall: "$1,350" },
-  { duration: "3 hours", incall: "$1,700", outcall: "$1,900" },
-  { duration: "Overnight", incall: "$4,500", outcall: "$5,000" },
+  { duration: "90 minutes", incall: "$500", outcall: "$700" },
+  { duration: "2 hours", incall: "$800", outcall: "$1,000" },
+  { duration: "3 hours", incall: "$1,200", outcall: "$1,400" },
+  { duration: "Overnight", incall: "$3,000", outcall: "$3,500" },
 ];
 
 const navLinks = [
