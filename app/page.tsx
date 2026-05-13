@@ -33,6 +33,7 @@ import Image from "next/image";
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { SITE } from "@/lib/site";
+import { submitBookingViaFormSubmit, type BookingPayload } from "@/lib/submit-booking-client";
 
 /** Local portraits in /public/leslie (copied from project root WhatsApp exports). */
 const GALLERY_COUNT = 18;
@@ -132,21 +133,52 @@ function BookingForm() {
     const fd = new FormData(form);
     setStatus("loading");
     setErrorMessage("");
+
+    const payload: BookingPayload = {
+      name: String(fd.get("name") ?? ""),
+      type: String(fd.get("type") ?? ""),
+      duration: String(fd.get("duration") ?? ""),
+      datetime: String(fd.get("datetime") ?? ""),
+    };
+
     try {
-      const res = await fetch("/api/booking", {
+      const apiRes = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: String(fd.get("name") ?? ""),
-          type: String(fd.get("type") ?? ""),
-          duration: String(fd.get("duration") ?? ""),
-          datetime: String(fd.get("datetime") ?? ""),
-        }),
+        body: JSON.stringify(payload),
       });
-      const data = (await res.json().catch(() => ({}))) as { error?: string };
-      if (!res.ok) throw new Error(data.error || "Could not send request");
-      setStatus("success");
-      form.reset();
+
+      if (apiRes.ok) {
+        setStatus("success");
+        form.reset();
+        return;
+      }
+
+      const apiData = (await apiRes.json().catch(() => ({}))) as {
+        code?: string;
+        error?: string;
+        message?: string;
+      };
+
+      if (apiRes.status === 501 && apiData.code === "NO_SERVER_MAIL") {
+        await submitBookingViaFormSubmit(payload);
+        setStatus("success");
+        form.reset();
+        return;
+      }
+
+      if (apiRes.status === 502 && apiData.code === "RESEND_FAILED") {
+        try {
+          await submitBookingViaFormSubmit(payload);
+          setStatus("success");
+          form.reset();
+          return;
+        } catch {
+          throw new Error(apiData.error || "Email could not be sent.");
+        }
+      }
+
+      throw new Error(apiData.error || apiData.message || "Could not send request");
     } catch (err) {
       setStatus("error");
       setErrorMessage(err instanceof Error ? err.message : "Something went wrong");
@@ -156,11 +188,12 @@ function BookingForm() {
   return (
     <form className="space-y-5" onSubmit={handleSubmit}>
       <p className="rounded-lg border border-white/5 bg-noir-900/40 px-4 py-3 text-xs leading-relaxed text-zinc-500">
-        Your request is emailed to{" "}
+        Your request is delivered to{" "}
         <a href={`mailto:${SITE.email}`} className="text-gold/90 underline-offset-2 hover:underline">
           {SITE.email}
         </a>
-        . If anything fails, use WhatsApp or call below.
+        . If anything fails, use WhatsApp or call below. First time using the form
+        provider, check that inbox for a one-time activation link.
       </p>
       <div>
         <label htmlFor="name" className="mb-2 block text-xs uppercase tracking-widest text-zinc-500">
